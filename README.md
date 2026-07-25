@@ -26,14 +26,14 @@ and points to the obligations that actually apply.
 ## Use it
 
 ```bash
-git clone https://github.com/<you>/eu-ai-act-risk-checker.git
+git clone https://github.com/tomdxb0004/eu-ai-act-risk-checker.git
 open eu-ai-act-risk-checker/index.html
 ```
 
 Or embed it on your own site:
 
 ```html
-<iframe src="https://<you>.github.io/eu-ai-act-risk-checker/"
+<iframe src="https://tomdxb0004.github.io/eu-ai-act-risk-checker/"
         style="width:100%;height:900px;border:0" title="EU AI Act risk checker"></iframe>
 ```
 
