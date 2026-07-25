@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EU AI Act Risk Checker — free, open-source</title>
+<meta name="description" content="Free open-source EU AI Act risk checker: answer 4 questions to classify your AI system's risk tier, obligations and compliance deadline. Regulation (EU) 2024/1689. Not legal advice." />
+<style>
+  :root{--ink:#141a2e;--ink2:#4a5170;--muted:#7b829c;--line:#e6e8f0;--bg:#f6f7fb;--blue:#273db4;--card:#fff}
+  @media(prefers-color-scheme:dark){:root{--ink:#eef0f7;--ink2:#c3c8db;--muted:#9299b5;--line:#2a3050;--bg:#0f1324;--card:#171c30}}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+  .wrap{max-width:720px;margin:0 auto;padding:32px 20px 56px}
+  .head h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-.02em;margin:0 0 10px}
+  .head p{color:var(--ink2);margin:0 0 8px;font-size:16px}
+  .app{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:28px;margin-top:22px;box-shadow:0 20px 50px rgba(18,22,45,.08)}
+  @media(max-width:520px){.app{padding:20px}}
+  .screen{display:none}.screen.on{display:block}
+  .bar{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .back,.restart{background:var(--bg);border:1px solid var(--line);border-radius:10px;font:inherit;font-size:13px;font-weight:700;color:var(--ink2);cursor:pointer;padding:8px 12px}
+  .restart{margin-left:auto}
+  .dots{display:flex;gap:6px}.dots i{width:20px;height:5px;border-radius:99px;background:var(--line)}
+  .dots i.fill{background:var(--blue)}
+  .stepn{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted);font-family:ui-monospace,monospace}
+  .q{font-size:clamp(19px,2.4vw,23px);font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+  .hint{color:var(--muted);font-size:14px;margin:0 0 16px}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;background:var(--bg);border:1.5px solid var(--line);border-radius:13px;padding:13px 15px;cursor:pointer}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{margin-top:3px;width:18px;height:18px;accent-color:var(--blue);flex:0 0 auto}
+  .opt span{font-size:15px;font-weight:600}
+  .btn{border:0;border-radius:12px;background:var(--blue);color:#fff;font:inherit;font-weight:700;font-size:15px;padding:12px 20px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+  .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+  .nav{margin-top:18px}
+  .intro p{color:var(--ink2)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 20px}
+  .chip{font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--bg);border:1px solid var(--line);padding:6px 12px;border-radius:99px}
+  /* result */
+  .r-pre{color:var(--muted);font-weight:600;font-size:14px;margin:0 0 12px}
+  .result{border-radius:16px;padding:22px 24px;border:1.5px solid}
+  .r-badge{display:inline-block;font-weight:800;font-size:18px;padding:6px 14px;border-radius:99px;color:#fff}
+  .r-tag{font-weight:700;font-size:16px;margin:14px 0 0}
+  .r-mean{color:var(--ink2);font-size:14.5px;margin:8px 0 0}
+  .r-block h4{font-size:12px;font-family:ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:18px 0 10px}
+  .r-ob{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px}
+  .r-ob li{display:flex;gap:10px;font-size:14.5px}.r-ob li::before{content:"✓";color:var(--blue);font-weight:800;flex:0 0 auto}
+  .r-dl{display:flex;gap:9px;font-size:14px;color:var(--ink2);margin:18px 0 0;padding-top:14px;border-top:1px dashed var(--line)}
+  .prohibited{background:#fdecec;border-color:#f5b5b5}.prohibited .r-badge{background:#c02626}
+  .high{background:#fdf1e3;border-color:#f3c98c}.high .r-badge{background:#c2410c}
+  .limited{background:#fff7e6;border-color:#ffe08a}.limited .r-badge{background:#b45309}
+  .minimal{background:#e7f6ee;border-color:#a7dcbf}.minimal .r-badge{background:#0a7c3e}
+  .gpai{background:#eef1fc;border-color:#c0caf2;margin-top:16px}.gpai .r-badge{background:#273db4}
+  @media(prefers-color-scheme:dark){.prohibited,.high,.limited,.minimal,.gpai{color:#141a2e}}
+  .gpai-head{font-family:ui-monospace,monospace;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin:0 0 10px}
+  .cta{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+  .cta h3{margin:0 0 6px;font-size:18px}.cta p{color:var(--ink2);font-size:14px;margin:0 0 14px}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:18px;text-align:center}
+  .foot a{color:var(--blue);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>EU AI Act risk checker</h1>
+    <p>Answer 4 short questions and see which EU AI Act risk tier your AI system falls into — with your obligations and the compliance deadline. Free, open-source, no email.</p>
+  </div>
+
+  <div class="app" id="card">
+    <div class="screen on intro" id="intro">
+      <div class="chips"><span class="chip">4 questions</span><span class="chip">~1 minute</span><span class="chip">No email</span></div>
+      <button class="btn" id="start">Start the check →</button>
+    </div>
+    <div id="steps"></div>
+    <div class="screen" id="result">
+      <div class="bar"><button class="restart" id="again">↻ Start over</button></div>
+      <div id="rbody"></div>
+      <div class="cta">
+        <h3>Want a real compliance check?</h3>
+        <p>This tool gives an indication, not legal advice. Crux Digits’ fixed-price AI audit (€2,500) checks your system against EU AI Act risk tiers and GDPR, and delivers a concrete plan.</p>
+        <a class="btn" href="https://cruxdigits.nl/eu-ai-act-risk-checker/" target="_blank" rel="noopener">Book an AI audit →</a>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">
+    Based on Regulation (EU) 2024/1689 (the EU AI Act). This tool is an indication, <b>not legal advice</b>.<br>
+    Open-source (MIT) · Built by <a href="https://cruxdigits.nl/" target="_blank" rel="noopener">Crux Digits</a> ·
+    <a href="https://cruxdigits.nl/eu-ai-act-risk-checker/" target="_blank" rel="noopener">Bilingual EN/NL version</a>
+  </p>
+</div>
+
+<script>
+const STEPS=[
+ {tier:'prohibited',q:'Does your AI system do any of these?',hint:'Prohibited practices (Art. 5). Tick anything that applies.',opts:[
+  'Subliminal or deceptive techniques that steer behaviour and could cause harm',
+  'Exploits vulnerabilities (age, disability, socio-economic situation)',
+  'Social scoring of people by public authorities or companies',
+  'Predictive policing based solely on profiling',
+  'Untargeted scraping of facial images to build recognition databases',
+  'Emotion recognition in the workplace or in education',
+  'Biometric categorisation by race, politics, religion or sexual orientation',
+  'Real-time remote biometric identification in public spaces (law enforcement)']},
+ {tier:'high',q:'Is it used in any of these areas?',hint:'High-risk uses (Annex III) and safety components of regulated products (Annex I).',opts:[
+  'As a safety component of a regulated product (machinery, medical, toys, vehicles…)',
+  'Biometrics — remote identification or categorisation',
+  'Critical infrastructure (traffic, water, gas, electricity)',
+  'Education — admission, scoring or exam proctoring',
+  'Recruitment, selection, promotion or monitoring of staff',
+  'Access to essential services — credit scoring, insurance, benefits, emergency dispatch',
+  'Law enforcement, migration, border control or administration of justice']},
+ {tier:'limited',q:'Does the system do any of these?',hint:'Transparency obligations (Art. 50).',opts:[
+  'Interacts directly with people (chatbot, virtual assistant)',
+  'Generates or manipulates text, image, audio or video (generative AI, deepfakes)',
+  'Emotion recognition or biometric categorisation (permitted use)']},
+ {tier:'gpai',single:true,q:'Are you developing your own general-purpose AI model?',hint:'A foundation or language model you train and provide (Art. 53–55).',opts:[
+  'Yes — we train/provide our own GPAI model','No — we use existing models or build applications on top']}
+];
+const TIERS={
+ prohibited:{label:'Unacceptable risk — banned',cls:'prohibited',tag:'This use is prohibited under the EU AI Act.',mean:'Systems that do this may not be placed on the market or used in the EU. There is no compliance route — the practice itself must stop.',ob:['Stop or redesign the use so the prohibited practice is removed','Assess whether a non-prohibited variant achieves the same goal','Document why your adjusted system no longer falls under Art. 5'],dl:'Already in force since 2 February 2025'},
+ high:{label:'High risk',cls:'high',tag:'Allowed, but with the heaviest obligations.',mean:'High-risk systems may be deployed, but only with a full compliance regime in place before they reach the market.',ob:['Risk-management system and data governance','Technical documentation and automatic logging','Human oversight, accuracy, robustness and cybersecurity','Conformity assessment + CE marking + EU database registration','Transparency to users and post-market monitoring'],dl:'From 2 August 2026 (Annex III) — Annex I products: 2 August 2027'},
+ limited:{label:'Limited risk — transparency duty',cls:'limited',tag:'Allowed, with disclosure obligations.',mean:'You can deploy this freely, but people must know they are dealing with AI, or that content was AI-generated.',ob:['Clearly inform users they are interacting with an AI system','Label AI-generated or manipulated content (deepfakes, synthetic media)','Inform exposed people when using emotion recognition or biometric categorisation'],dl:'From 2 August 2026'},
+ minimal:{label:'Minimal risk',cls:'minimal',tag:'No mandatory AI Act requirements.',mean:'Most business AI sits here — spam filters, recommendations, process automation. No specific AI Act obligations apply, just good practice.',ob:['Voluntary codes of conduct are encouraged','AI literacy for staff IS required for everyone (Art. 4, since 2 Feb 2025)','Keep the classification current if the use changes'],dl:'No specific deadline — AI literacy (Art. 4) already applies'},
+ gpai:{label:'GPAI model',cls:'gpai',tag:'Providers of general-purpose models have their own obligations.',ob:['Technical documentation and information for downstream providers','A policy to comply with EU copyright law','A public summary of the training data','If systemic risk (>10^25 FLOPs): model evaluation, adversarial testing, incident reporting, cybersecurity'],dl:'Already in force since 2 August 2025'}
+};
+const card=document.getElementById('card'),stepsEl=document.getElementById('steps');
+const order=['intro'];
+STEPS.forEach((st,i)=>{
+  order.push('step'+i);
+  const sc=document.createElement('div');sc.className='screen';sc.id='step'+i;
+  const dots=STEPS.map((_,j)=>'<i class="'+(j<=i?'fill':'')+'"></i>').join('');
+  sc.innerHTML='<div class="bar"><button class="back" data-to="'+(i===0?'intro':'step'+(i-1))+'">←</button><div class="dots">'+dots+'</div><span class="stepn">Step '+(i+1)+'/'+STEPS.length+'</span></div>'+
+   '<h3 class="q">'+st.q+'</h3><p class="hint">'+st.hint+'</p><div class="opts">'+
+   st.opts.map(o=>'<label class="opt"><input type="'+(st.single?'radio':'checkbox')+'" name="s'+i+'" data-tier="'+st.tier+'" value="'+o.slice(0,4)+'"><span>'+o+'</span></label>').join('')+
+   '</div><div class="nav"><button class="btn next" data-step="'+i+'">'+(i===STEPS.length-1?'Show result':'Next')+' →</button></div>';
+  stepsEl.appendChild(sc);
+});
+order.push('result');
+function show(id){order.forEach(s=>{const e=document.getElementById(s);if(e)e.classList.toggle('on',s===id)});card.scrollIntoView({behavior:'smooth',block:'start'})}
+document.getElementById('start').onclick=()=>show('step0');
+card.addEventListener('click',e=>{
+  if(e.target.classList.contains('back'))show(e.target.dataset.to);
+  if(e.target.classList.contains('next')){const i=+e.target.dataset.step;i<STEPS.length-1?show('step'+(i+1)):compute();}
+});
+document.getElementById('again').onclick=()=>{card.querySelectorAll('input').forEach(x=>x.checked=false);show('intro')};
+function picked(t){return card.querySelectorAll('input[data-tier="'+t+'"]:checked').length>0}
+function block(k){const t=TIERS[k];return '<div class="result '+t.cls+'"><span class="r-badge">'+t.label+'</span><p class="r-tag">'+t.tag+'</p>'+
+ (t.mean?'<p class="r-mean">'+t.mean+'</p>':'')+'<div class="r-block"><h4>Your key obligations</h4><ul class="r-ob">'+t.ob.map(o=>'<li>'+o+'</li>').join('')+'</ul></div>'+
+ '<p class="r-dl"><b>Compliance deadline:</b>&nbsp;'+t.dl+'</p></div>'}
+function compute(){
+  const k=picked('prohibited')?'prohibited':picked('high')?'high':picked('limited')?'limited':'minimal';
+  let html='<p class="r-pre">Your AI system most likely falls under:</p>'+block(k);
+  const g=card.querySelector('input[data-tier="gpai"]:checked');
+  if(g&&g.parentNode.querySelector('span').textContent.startsWith('Yes'))html+='<div class="gpai"><div class="gpai-head">Plus: GPAI obligations</div>'+block('gpai')+'</div>';
+  document.getElementById('rbody').innerHTML=html;show('result');
+}
+</script>
+</body>
+</html>
