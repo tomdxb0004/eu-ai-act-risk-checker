@@ -121,13 +121,43 @@
     var highRisk = [];
     var exemption = null;
 
-    // Art. 6(1): safety component of, or itself, a product under Annex I law
-    // that requires a third-party conformity assessment. Art. 6(3) does not
-    // apply to this route.
-    if (a.annexIProduct && a.annexIThirdPartyAssessment) {
-      highRisk.push({ ref: 'Art. 6(1), Annex I', basis: 'annexI', from: DATES.highRiskAnnexI });
-    } else if (a.annexIProduct) {
-      notes.push({ ref: 'Art. 6(1)', key: 'annexINoThirdPartyAssessment' });
+    // Art. 6(1) with the limits of Art. 6(1a)-(1c), inserted by Reg. (EU) 2026/1744.
+    // Point (a): the AI system is itself an Annex I product, or is intended to
+    // be used as a safety component of one.
+    //   (1a) AI systems solely used for non-safety related aspects of user
+    //        assistance, performance optimisation, service efficiency,
+    //        automation or convenience, or quality control, are not safety
+    //        components;
+    //   (1b) AI systems whose failure or malfunctioning would endanger health
+    //        and safety are safety components.
+    // Point (b): the product must undergo a third-party conformity assessment.
+    //   (1c) a third-party assessment required solely for risks other than
+    //        health and safety (radio spectrum, electromagnetic interference
+    //        that does not affect health and safety) does not meet point (b).
+    // Art. 6(3) does not apply to this route.
+    var annexIBasis = null;
+    if (a.annexIProduct) {
+      var safetyComponent = a.annexIFailureEndangersHealthSafety
+        ? true
+        : a.annexISolelyNonSafetyUse ? false : !!a.annexISafetyFunction;
+      var pointA = !!a.annexIIsProduct || safetyComponent;
+      var pointB = !!a.annexIThirdPartyAssessment && !a.annexIThirdPartySolelyNonSafetyRisks;
+
+      if (!a.annexIIsProduct && a.annexISolelyNonSafetyUse && !a.annexIFailureEndangersHealthSafety) {
+        notes.push({ ref: 'Art. 6(1a)', key: 'annexINonSafetyUse' });
+      } else if (!pointA) {
+        notes.push({ ref: 'Art. 6(1)(a)', key: 'annexINotSafetyComponent' });
+      }
+      if (a.annexIThirdPartyAssessment && a.annexIThirdPartySolelyNonSafetyRisks) {
+        notes.push({ ref: 'Art. 6(1c)', key: 'annexIThirdPartyNonSafetyRisksOnly' });
+      } else if (!a.annexIThirdPartyAssessment) {
+        notes.push({ ref: 'Art. 6(1)(b)', key: 'annexINoThirdPartyAssessment' });
+      }
+
+      if (pointA && pointB) {
+        annexIBasis = a.annexIIsProduct ? 'product' : (a.annexIFailureEndangersHealthSafety && a.annexISolelyNonSafetyUse ? 'failureEndangersSafety' : 'safetyComponent');
+        highRisk.push({ ref: 'Art. 6(1), Annex I', basis: 'annexI', annexIBasis: annexIBasis, from: DATES.highRiskAnnexI });
+      }
     }
 
     var areas = (a.annexIII || []).filter(function (x) { return ANNEX_III_AREAS.indexOf(x) !== -1; });

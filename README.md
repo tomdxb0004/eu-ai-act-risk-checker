@@ -44,8 +44,17 @@ DOM access. The page only collects answers and renders the result.
    - (ba) non-consensual intimate imagery and (bb) child sexual abuse material,
      added by Reg. (EU) 2026/1744 and applicable from 2 December 2026.
 3. **High risk**:
-   - Art. 6(1) and Annex I: products or safety components that require a
-     third-party conformity assessment. Art. 6(3) does not apply to this route.
+   - Art. 6(1) and Annex I, with the limits of **Art. 6(1a)-(1c)** of
+     Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744.
+     Point (a) is met when the AI system is itself the Annex I product, or is a
+     safety component of one. An AI system used solely for non-safety related
+     user assistance, performance optimisation, service efficiency,
+     automation, convenience or quality control is not a safety component
+     (1a), unless its failure or malfunctioning would endanger health and
+     safety (1b). Point (b) needs a third-party conformity assessment, and an
+     assessment required solely for other risks, such as radio spectrum or
+     electromagnetic interference that does not affect health and safety, does
+     not count (1c). Art. 6(3) does not apply to this route.
    - Art. 6(2) and Annex III: the eight listed areas, followed by the
      **Art. 6(3)** check. The system is not high-risk if it meets one of
      conditions (a)-(d) and poses no significant risk, **unless it profiles
@@ -80,7 +89,7 @@ every case.
 | Art. 50(2) marking, systems on the market before 2 Aug 2026 | 2 Dec 2026 | Reg. 2026/1744 |
 | New prohibitions Art. 5(1)(ba), (bb) | 2 Dec 2026 | Reg. 2026/1744 |
 | High-risk, Annex III (Art. 6(2)) | 2 Dec 2027 | Art. 113 as amended by Reg. 2026/1744 |
-| High-risk, Annex I (Art. 6(1)) | 2 Aug 2028 | Art. 113 as amended by Reg. 2026/1744 |
+| High-risk, Annex I (Art. 6(1), limited by Art. 6(1a)-(1c)) | 2 Aug 2028 | Art. 113 as amended by Reg. 2026/1744 |
 
 ## Tests
 
@@ -108,6 +117,10 @@ The tests run on every push through GitHub Actions.
 
 ## Changelog
 
+- **15 Sep 2026**: Annex I route follows Art. 6(1a)-(1c): explicit inputs
+  for safety function, non-safety use, failure endangering health and safety,
+  and third-party assessment required solely for non-safety risks, with
+  positive and negative tests.
 - **14 Sep 2026**: legal logic rewritten. High-risk dates updated to
   Reg. (EU) 2026/1744; Art. 6(3) exception added; Art. 50 split into provider
   and deployer duties; Art. 5 conditions and exceptions added, including the

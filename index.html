@@ -90,9 +90,14 @@
       { k: 'art5.nonConsensualIntimateImagery', l: 'Generates realistic intimate or sexually explicit imagery of identifiable people without consent, or this is a foreseeable outcome without adequate safeguards', ref: 'Art. 5(1)(ba), from 2 Dec 2026' },
       { k: 'art5.childSexualAbuseMaterial', l: 'Generates or manipulates child sexual abuse material', ref: 'Art. 5(1)(bb), from 2 Dec 2026' } ] },
 
-    { title: 'Is it used in a high-risk context?', hint: 'Article 6(1) with Annex I (regulated products) and Article 6(2) with Annex III (listed uses).', opts: [
-      { k: 'annexIProduct', l: 'It is a product, or a safety component of a product, covered by Annex I law (machinery, toys, lifts, medical devices, vehicles and more)', ref: 'Art. 6(1)', sub: [
-        { k: 'annexIThirdPartyAssessment', l: 'That product law requires a third-party conformity assessment' } ] },
+    { title: 'Is it used in a high-risk context?', hint: 'Article 6(1) with Annex I (regulated products), as limited by Article 6(1a) to (1c) of Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, and Article 6(2) with Annex III (listed uses).', opts: [
+      { k: 'annexIProduct', l: 'It is, or is part of, a product covered by Annex I law (machinery, toys, lifts, medical devices, vehicles and more)', ref: 'Art. 6(1)', sub: [
+        { k: 'annexIIsProduct', l: 'The AI system is itself the regulated product (Art. 6(1)(a))' },
+        { k: 'annexISafetyFunction', l: 'It fulfils a safety function in that product (Art. 6(1)(a))' },
+        { k: 'annexISolelyNonSafetyUse', l: 'It is used solely for non-safety related user assistance, performance optimisation, service efficiency, automation, convenience or quality control (Art. 6(1a))' },
+        { k: 'annexIFailureEndangersHealthSafety', l: 'Its failure or malfunctioning would endanger health and safety (Art. 6(1b))' },
+        { k: 'annexIThirdPartyAssessment', l: 'The product must undergo a third-party conformity assessment under that law (Art. 6(1)(b))' },
+        { k: 'annexIThirdPartySolelyNonSafetyRisks', l: 'That assessment is required solely for risks other than health and safety, such as radio spectrum or electromagnetic interference that does not affect health and safety (Art. 6(1c))' } ] },
       { k: 'annexIII:biometrics', l: 'Biometrics: remote identification, biometric categorisation or emotion recognition (not identity verification alone)', ref: 'Annex III(1)' },
       { k: 'annexIII:criticalInfrastructure', l: 'Safety component in critical infrastructure: digital infrastructure, road traffic, water, gas, heating or electricity', ref: 'Annex III(2)' },
       { k: 'annexIII:education', l: 'Education: admission, evaluating learning outcomes, assigning level, monitoring exams', ref: 'Annex III(3)' },
@@ -152,7 +157,10 @@
     socialScoringConditionsNotMet: 'Social scoring is banned only when it leads to unrelated-context or disproportionate detrimental treatment.',
     emotionMedicalSafetyException: 'Emotion recognition for medical or safety reasons is not banned; it can still be high-risk under Annex III(1).',
     rbiPermittedUnderSafeguards: 'Permitted only within the Art. 5(2)-(7) safeguards; treated here as high-risk under Annex III(1).',
-    annexINoThirdPartyAssessment: 'Without a third-party conformity assessment, Art. 6(1) does not make the system high-risk.',
+    annexINoThirdPartyAssessment: 'Without a third-party conformity assessment, Art. 6(1)(b) is not met.',
+    annexINotSafetyComponent: 'Not the regulated product itself and not a safety component, so Art. 6(1)(a) is not met.',
+    annexINonSafetyUse: 'Used solely for non-safety assistance, optimisation, efficiency, automation, convenience or quality control, so not a safety component (Art. 6(1a)), unless failure would endanger health and safety (Art. 6(1b)).',
+    annexIThirdPartyNonSafetyRisksOnly: 'A third-party assessment required solely for non-safety risks, such as radio spectrum or non-safety electromagnetic interference, does not meet Art. 6(1)(b) (Art. 6(1c)).',
   };
   var HIGH_OBLIGATIONS = ['Risk management system (Art. 9) and data governance (Art. 10)', 'Technical documentation (Art. 11) and record-keeping (Art. 12)', 'Transparency to deployers (Art. 13) and human oversight (Art. 14)', 'Accuracy, robustness and cybersecurity (Art. 15)', 'Providers: conformity assessment, CE marking and registration (Art. 16, 43, 48, 49)', 'Deployers: use per instructions, oversight, monitoring, logs; FRIA where Art. 27 applies'];
 

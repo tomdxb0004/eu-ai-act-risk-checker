@@ -1,6 +1,6 @@
 {
   "name": "eu-ai-act-risk-checker",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "description": "Browser-based EU AI Act risk-tier triage with cited articles and decision tests",
   "license": "MIT",

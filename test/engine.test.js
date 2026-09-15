@@ -88,12 +88,51 @@ test('Art. 6(3): a significant risk to health, safety or rights removes the exem
   assert.equal(r.tier, 'high');
 });
 
-test('Annex I: high-risk from 2 August 2028, only with third-party conformity assessment', () => {
-  assert.equal(evaluate({ annexIProduct: true }).tier, 'minimal');
-  const r = evaluate({ annexIProduct: true, annexIThirdPartyAssessment: true, art63: { narrowProcedural: true } });
+test('Annex I: the old two-checkbox input (product + third-party assessment) is no longer high-risk on its own', () => {
+  const r = evaluate({ annexIProduct: true, annexIThirdPartyAssessment: true });
+  assert.equal(r.tier, 'minimal');
+  assert.deepEqual(refs(r.notes), ['Art. 6(1)(a)']);
+});
+
+test('Art. 6(1): a safety component with a third-party assessment is high-risk from 2 August 2028, without Art. 6(3)', () => {
+  const r = evaluate({ annexIProduct: true, annexISafetyFunction: true, annexIThirdPartyAssessment: true, annexIII: [], art63: { narrowProcedural: true } });
   assert.equal(r.tier, 'high');
   assert.equal(r.highRisk[0].from, '2028-08-02');
+  assert.equal(r.highRisk[0].annexIBasis, 'safetyComponent');
   assert.equal(r.exemption, null, 'Art. 6(3) does not apply to the Annex I route');
+});
+
+test('Art. 6(1): an AI system that is itself the Annex I product, with a third-party assessment, is high-risk', () => {
+  const r = evaluate({ annexIProduct: true, annexIIsProduct: true, annexIThirdPartyAssessment: true });
+  assert.equal(r.tier, 'high');
+  assert.equal(r.highRisk[0].annexIBasis, 'product');
+});
+
+test('Art. 6(1a): AI used solely for non-safety assistance, optimisation, efficiency, automation, convenience or quality control is not a safety component', () => {
+  const r = evaluate({ annexIProduct: true, annexISafetyFunction: true, annexISolelyNonSafetyUse: true, annexIThirdPartyAssessment: true });
+  assert.equal(r.tier, 'minimal');
+  assert.deepEqual(refs(r.notes), ['Art. 6(1a)']);
+});
+
+test('Art. 6(1b): it is a safety component again where failure or malfunction would endanger health or safety', () => {
+  const r = evaluate({ annexIProduct: true, annexISolelyNonSafetyUse: true, annexIFailureEndangersHealthSafety: true, annexIThirdPartyAssessment: true });
+  assert.equal(r.tier, 'high');
+  assert.equal(r.highRisk[0].annexIBasis, 'failureEndangersSafety');
+  assert.equal(evaluate({ annexIProduct: true, annexIFailureEndangersHealthSafety: true }).tier, 'minimal', 'still needs point (b)');
+});
+
+test('Art. 6(1c): a third-party assessment required solely for non-safety risks does not satisfy Art. 6(1)(b)', () => {
+  const r = evaluate({ annexIProduct: true, annexISafetyFunction: true, annexIThirdPartyAssessment: true, annexIThirdPartySolelyNonSafetyRisks: true });
+  assert.equal(r.tier, 'minimal');
+  assert.deepEqual(refs(r.notes), ['Art. 6(1c)']);
+  const product = evaluate({ annexIProduct: true, annexIIsProduct: true, annexIThirdPartyAssessment: true, annexIThirdPartySolelyNonSafetyRisks: true });
+  assert.equal(product.tier, 'minimal', 'the (1c) limit also applies when the AI system is itself the product');
+});
+
+test('Art. 6(1)(b): a safety component without any third-party assessment is not high-risk', () => {
+  const r = evaluate({ annexIProduct: true, annexISafetyFunction: true });
+  assert.equal(r.tier, 'minimal');
+  assert.deepEqual(refs(r.notes), ['Art. 6(1)(b)']);
 });
 
 test('Art. 50: a deployer is not given the provider duties', () => {
